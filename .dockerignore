@@ -1,0 +1,12 @@
+.gitignore
+.git
+
+.docker
+
+app/__app__/
+app/*/__app__/
+app/*/*/__app__/
+app/*/*/*/__app__/
+.env/
+.venv/
+venv/
