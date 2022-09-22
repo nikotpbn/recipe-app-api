@@ -1,6 +1,4 @@
 from decimal import Decimal
-from unicodedata import name
-from venv import create
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
@@ -17,11 +15,11 @@ from core.models import (
 
 from recipe.serializers import (
     RecipeSerializer,
-    RecipeDetailSerializer,
-    IngredientSerializer,
+    RecipeDetailSerializer
 )
 
 RECIPES_URL = reverse('recipe:recipe-list')
+
 
 def detail_url(recipe_id):
     return reverse('recipe:recipe-detail', args=[recipe_id])
@@ -39,6 +37,7 @@ def create_recipe(user, **kwargs):
 
     recipe = Recipe.objects.create(user=user,  **defaults)
     return recipe
+
 
 def create_user(**kwargs):
     return get_user_model().objects.create_user(**kwargs)
@@ -74,7 +73,10 @@ class PrivateRecipeAPITests(TestCase):
         self.assertEqual(response.data, serialier.data)
 
     def test_recipe_list_limited_to_user(self):
-        other_user = create_user(email='other@example.com', password='testpass123')
+        other_user = create_user(
+            email='other@example.com',
+            password='testpass123'
+        )
         create_recipe(user=other_user)
         create_recipe(user=self.user)
 
@@ -112,7 +114,7 @@ class PrivateRecipeAPITests(TestCase):
     def test_partial_update(self):
         original_link = 'https://example.com/recipe.pdf'
         recipe = create_recipe(
-            user = self.user,
+            user=self.user,
             title='Sample recipe title',
             link=original_link
         )
@@ -129,7 +131,7 @@ class PrivateRecipeAPITests(TestCase):
 
     def test_full_update(self):
         recipe = create_recipe(
-            user = self.user,
+            user=self.user,
             title='Sample recipe title',
             link='https://example.com/recipe.pdf',
             description='Sample recipe description',
@@ -348,4 +350,3 @@ class PrivateRecipeAPITests(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(recipe.ingredients.count(), 0)
-

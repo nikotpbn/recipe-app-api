@@ -1,4 +1,3 @@
-from venv import create
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.test import TestCase
@@ -13,6 +12,7 @@ from recipe.serializers import TagSerializer
 
 TAGS_URL = reverse('recipe:tag-list')
 
+
 def detail_url(tag_id):
     return reverse('recipe:tag-detail', args=[tag_id])
 
@@ -22,7 +22,6 @@ def create_user(email='user@example.com', password='testpass123'):
 
 
 class PublicTagsAPITests(TestCase):
-
 
     def setUp(self):
         self.client = APIClient()
@@ -34,7 +33,6 @@ class PublicTagsAPITests(TestCase):
 
 
 class PrivateTagsTests(TestCase):
-
 
     def setUp(self):
         self.user = create_user()

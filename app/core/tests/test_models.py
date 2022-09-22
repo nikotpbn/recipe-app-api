@@ -1,6 +1,4 @@
-from random import sample
 from decimal import Decimal
-from venv import create
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 
@@ -73,6 +71,10 @@ class ModelTests(TestCase):
 
     def test_create_ingredient(self):
         user = create_user()
-        ingredient = models.Ingredient.objects.create(user=user, name='Ingredient 1')
+        ingredient = models.Ingredient.objects.create \
+        (
+            user=user,
+            name='Ingredient 1'
+        )
 
         self.assertEqual(str(ingredient), ingredient.name)

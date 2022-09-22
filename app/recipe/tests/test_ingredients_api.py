@@ -1,4 +1,3 @@
-from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.test import TestCase
 
@@ -12,16 +11,17 @@ from recipe.serializers import IngredientSerializer
 
 INGREDIENTS_URL = reverse('recipe:ingredient-list')
 
+
 def detail_url(ingredient_id):
     return reverse('recipe:ingredient-detail', args=[ingredient_id])
 
-class PublicIngredientAPITest(TestCase):
 
+class PublicIngredientAPITest(TestCase):
 
     def setUp(self):
         self.user = create_user(
-            email = 'user@example.com',
-            password = 'testpass123',
+            email='user@example.com',
+            password='testpass123',
         )
         self.client = APIClient()
 
@@ -33,51 +33,61 @@ class PublicIngredientAPITest(TestCase):
 
 class PrivateIngredientAPITest(TestCase):
 
-        def setUp(self):
-            self.user = create_user(email = 'user@example.com',)
-            self.client = APIClient()
-            self.client.force_authenticate(self.user)
 
-        def test_retrieve_ingredients(self):
-            Ingredient.objects.create(user=self.user, name='Kale')
-            Ingredient.objects.create(user=self.user, name='Vanilla')
+    def setUp(self):
+        self.user = create_user(email='user@example.com',)
+        self.client = APIClient()
+        self.client.force_authenticate(self.user)
 
-            response = self.client.get(INGREDIENTS_URL)
+    def test_retrieve_ingredients(self):
+        Ingredient.objects.create(user=self.user, name='Kale')
+        Ingredient.objects.create(user=self.user, name='Vanilla')
 
-            ingredients = Ingredient.objects.all().order_by('-name')
-            serializer = IngredientSerializer(ingredients, many=True)
+        response = self.client.get(INGREDIENTS_URL)
 
-            self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self.assertEqual(response.data, serializer.data)
+        ingredients = Ingredient.objects.all().order_by('-name')
+        serializer = IngredientSerializer(ingredients, many=True)
 
-        def test_ingredients_limited_to_user(self):
-            user2 = create_user(email = 'user2@example.com')
-            Ingredient.objects.create(user=user2, name='Salt')
-            ingredient = Ingredient.objects.create(user=self.user, name='Pepper')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, serializer.data)
 
-            response = self.client.get(INGREDIENTS_URL)
+    def test_ingredients_limited_to_user(self):
+        user2 = create_user(email='user2@example.com')
+        Ingredient.objects.create(user=user2, name='Salt')
+        ingredient = Ingredient.objects.create(
+            user=self.user,
+            name='Pepper'
+        )
 
-            self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self.assertEqual(len(response.data), 1)
-            self.assertEqual(response.data[0]['name'], ingredient.name)
-            self.assertEqual(response.data[0]['id'], ingredient.id)
+        response = self.client.get(INGREDIENTS_URL)
 
-        def test_update_ingredient(self):
-            ingredient = Ingredient.objects.create(user=self.user, name='Cilantro')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['name'], ingredient.name)
+        self.assertEqual(response.data[0]['id'], ingredient.id)
 
-            payload = {'name': 'Coriander'}
-            url = detail_url(ingredient.id)
-            response = self.client.patch(url, payload)
+    def test_update_ingredient(self):
+        ingredient = Ingredient.objects.create(
+            user=self.user,
+            name='Cilantro'
+        )
 
-            self.assertEqual(response.status_code, status.HTTP_200_OK)
-            ingredient.refresh_from_db()
-            self.assertEqual(ingredient.name, payload['name'])
+        payload = {'name': 'Coriander'}
+        url = detail_url(ingredient.id)
+        response = self.client.patch(url, payload)
 
-        def test_delete_ingredient(self):
-            ingredient = Ingredient.objects.create(user=self.user, name='Lettuce')
-            url = detail_url(ingredient.id)
-            response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        ingredient.refresh_from_db()
+        self.assertEqual(ingredient.name, payload['name'])
 
-            self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-            ingredients = Ingredient.objects.filter(user=self.user)
-            self.assertFalse(ingredients.exists())
+    def test_delete_ingredient(self):
+        ingredient = Ingredient.objects.create(
+            user=self.user,
+            name='Lettuce'
+        )
+        url = detail_url(ingredient.id)
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        ingredients = Ingredient.objects.filter(user=self.user)
+        self.assertFalse(ingredients.exists())
