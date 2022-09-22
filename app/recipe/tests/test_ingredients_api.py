@@ -33,7 +33,6 @@ class PublicIngredientAPITest(TestCase):
 
 class PrivateIngredientAPITest(TestCase):
 
-
     def setUp(self):
         self.user = create_user(email='user@example.com',)
         self.client = APIClient()
