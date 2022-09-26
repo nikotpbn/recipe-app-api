@@ -12,7 +12,6 @@ from rest_framework.response import Response
 
 from core.models import Recipe, Tag, Ingredient
 from recipe import serializers
-from symbol import parameters
 
 @extend_schema_view(
     list=extend_schema(
@@ -20,12 +19,12 @@ from symbol import parameters
             OpenApiParameter(
                 'tags',
                 OpenApiTypes.STR,
-                description = 'Comma separated list of tags IDs to filter'
+                description='Comma separated list of tags IDs to filter'
             ),
             OpenApiParameter(
                 'ingredients',
                 OpenApiTypes.STR,
-                description = 'Comma separated list of ingredients IDs to filter'
+                description='Comma separated list of ingredients IDs to filter'
             ),
         ]
     )
@@ -51,7 +50,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(ingredients__id__in=ingredient_ids)
 
         return queryset.filter(
-            user =self.request.user
+            user=self.request.user
         ).order_by('-id').distinct()
 
     def get_serializer_class(self):
@@ -104,7 +103,7 @@ class BaseRecipeAttrViewSet(mixins.DestroyModelMixin,
 
         return queryset.filter(
             user=self.request.user
-            ).order_by('-name').distinct()
+        ).order_by('-name').distinct()
 
 
 class TagViewSet(BaseRecipeAttrViewSet):
