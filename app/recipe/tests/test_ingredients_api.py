@@ -1,4 +1,3 @@
-from threading import TIMEOUT_MAX
 from django.urls import reverse
 from django.test import TestCase
 from decimal import Decimal
